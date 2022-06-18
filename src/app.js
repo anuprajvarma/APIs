@@ -8,15 +8,48 @@ app.use(exprss.json());
 
 const port = 5000;
 
-app.post("/students", (req, res) => {
-    const user = new Student(req.body)
-    //res.send(req.body)
+app.post('/students',async(req,res)=>{
+    try{
+        const user = new Student(req.body);
+        const createUser = await user.save();
+        res.status(201).send(createUser);
+    }catch(err){ 
+        res.status(400).send(err);
+    }
+})
 
-    user.save().then(()=>{
-        res.status(201).send(user);
-    }).catch((e)=>{
-        res.status(400).send(e);
-    })
+
+app.get('/students/:uid',async(req,res)=>{
+    try{
+        const id = req.params.uid;
+       const studentsDB = await Student.findById(id);
+       res.status(200).send(studentsDB);
+    }catch(err){
+        res.status(400).send(err);
+    }
+})
+
+app.patch('/students/:uid',async(req,res)=>{
+    try{
+        const id = req.params.uid;
+        const update = req.body;
+        const studentsDB = await Student.findByIdAndUpdate(id,update,{
+            new:true
+        });
+        res.status(200).send(studentsDB);
+    }catch(err){
+        res.status(400).send(err);
+    }
+})
+
+app.delete('/students/:uid',async(req,res)=>{
+    try{
+        const id = req.params.uid;
+        const studentsDB = await Student.findByIdAndDelete(id);
+        res.status(200).send(studentsDB)
+    }catch(err){
+        res.status(400).send(err);
+    }
 })
 
 app.listen(port, function () {
